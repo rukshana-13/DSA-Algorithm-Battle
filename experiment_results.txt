@@ -1,0 +1,30 @@
+ALGORITHM BATTLE – EXPERIMENT RESULTS
+
+Application: Student Record Search System
+Programming Language: C
+Dataset Size: 30 unique records
+
+Successful Search Key: 303
+Unsuccessful Search Key: 999
+
+EXPECTED EXPERIMENTAL RESULTS
+
+Parameter	BST	AVL	Hashing
+Successful Search Comparisons	3	2	3
+Unsuccessful Search Comparisons	5	5	0
+Height	12	6	N/A
+Insertion Collisions	N/A	N/A	10
+
+OBSERVATIONS
+
+1. BST supports ordered traversal but can become unbalanced.
+2. AVL maintains balance using rotations.
+3. Hashing handles collisions using Linear Probing.
+4. AVL requires fewer comparisons than BST for the successful search tested.
+5. Hashing provides efficient average-case searching.
+
+FINAL CONCLUSION
+
+Hashing with Linear Probing is recommended for fast student record retrieval. AVL is a suitable alternative when balanced searching and sorted traversal are required.
+
+Note: Values above are calculated expected results from the supplied implementations and dataset; they should be verified by executing the programs before being submitted as experimental observations.
