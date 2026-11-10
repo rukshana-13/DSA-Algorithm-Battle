@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int id;
+    char name[30];
+    struct Node *left, *right;
+};
+
+int comparisons = 0;
+
+struct Node* createNode(int id, char name[]) {
+    struct Node* newNode = malloc(sizeof(struct Node));
+
+    newNode->id = id;
+    snprintf(newNode->name, sizeof(newNode->name), "%s", name);
+    newNode->left = newNode->right = NULL;
+
+    return newNode;
+}
+
+struct Node* insert(struct Node* root, int id, char name[]) {
+    if (root == NULL)
+        return createNode(id, name);
+
+    if (id < root->id)
+        root->left = insert(root->left, id, name);
+    else if (id > root->id)
+        root->right = insert(root->right, id, name);
+
+    return root;
+}
+
+struct Node* search(struct Node* root, int id) {
+    while (root != NULL) {
+        comparisons++;
+
+        if (id == root->id)
+            return root;
+
+        if (id < root->id)
+            root = root->left;
+        else
+            root = root->right;
+    }
+
+    return NULL;
+}
+
+void inorder(struct Node* root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d - %s\n", root->id, root->name);
+        inorder(root->right);
+    }
+}
+
+int height(struct Node* root) {
+    if (root == NULL)
+        return 0;
+
+    int l = height(root->left);
+    int r = height(root->right);
+
+    return 1 + (l > r ? l : r);
+}
+
+int main() {
+    struct Node* root = NULL;
+    int n, id, key;
+    char name[30];
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter ID and Name: ");
+        scanf("%d %29s", &id, name);
+        root = insert(root, id, name);
+    }
+
+    printf("\nStudent Records:\n");
+    inorder(root);
+
+    printf("\nEnter ID to search: ");
+    scanf("%d", &key);
+
+    comparisons = 0;
+
+    struct Node* result = search(root, key);
+
+    if (result != NULL)
+        printf("Student Found: %s\n", result->name);
+    else
+        printf("Student Not Found\n");
+
+    printf("Search Comparisons: %d\n", comparisons);
+    printf("BST Height: %d\n", height(root));
+
+    return 0;
+}

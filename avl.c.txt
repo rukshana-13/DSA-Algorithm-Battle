@@ -1,0 +1,167 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int id;
+    char name[30];
+    int height;
+    struct Node *left, *right;
+};
+
+int comparisons = 0;
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+int height(struct Node *n) {
+    return (n == NULL) ? 0 : n->height;
+}
+
+int balance(struct Node *n) {
+    return (n == NULL) ? 0 :
+           height(n->left) - height(n->right);
+}
+
+struct Node* createNode(int id, char name[]) {
+    struct Node *n = malloc(sizeof(struct Node));
+
+    n->id = id;
+    snprintf(n->name, sizeof(n->name), "%s", name);
+    n->left = n->right = NULL;
+    n->height = 1;
+
+    return n;
+}
+
+struct Node* rightRotate(struct Node *y) {
+    struct Node *x = y->left;
+    struct Node *t = x->right;
+
+    x->right = y;
+    y->left = t;
+
+    y->height = 1 + max(height(y->left),
+                        height(y->right));
+    x->height = 1 + max(height(x->left),
+                        height(x->right));
+
+    return x;
+}
+
+struct Node* leftRotate(struct Node *x) {
+    struct Node *y = x->right;
+    struct Node *t = y->left;
+
+    y->left = x;
+    x->right = t;
+
+    x->height = 1 + max(height(x->left),
+                        height(x->right));
+    y->height = 1 + max(height(y->left),
+                        height(y->right));
+
+    return y;
+}
+
+struct Node* insert(struct Node *root,
+                    int id, char name[]) {
+
+    if (root == NULL)
+        return createNode(id, name);
+
+    if (id < root->id)
+        root->left = insert(root->left, id, name);
+
+    else if (id > root->id)
+        root->right = insert(root->right, id, name);
+
+    else
+        return root;
+
+    root->height = 1 + max(height(root->left),
+                           height(root->right));
+
+    int b = balance(root);
+
+    // LL Rotation
+    if (b > 1 && id < root->left->id)
+        return rightRotate(root);
+
+    // RR Rotation
+    if (b < -1 && id > root->right->id)
+        return leftRotate(root);
+
+    // LR Rotation
+    if (b > 1 && id > root->left->id) {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+
+    // RL Rotation
+    if (b < -1 && id < root->right->id) {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    return root;
+}
+
+struct Node* search(struct Node *root, int key) {
+    while (root != NULL) {
+        comparisons++;
+
+        if (key == root->id)
+            return root;
+
+        if (key < root->id)
+            root = root->left;
+        else
+            root = root->right;
+    }
+
+    return NULL;
+}
+
+void inorder(struct Node *root) {
+    if (root != NULL) {
+        inorder(root->left);
+        printf("%d - %s\n", root->id, root->name);
+        inorder(root->right);
+    }
+}
+
+int main() {
+    struct Node *root = NULL;
+    int n, id, key;
+    char name[30];
+
+    printf("Enter number of students: ");
+    scanf("%d", &n);
+
+    for (int i = 0; i < n; i++) {
+        printf("Enter ID and Name: ");
+        scanf("%d %29s", &id, name);
+        root = insert(root, id, name);
+    }
+
+    printf("\nStudent Records:\n");
+    inorder(root);
+
+    printf("\nEnter ID to search: ");
+    scanf("%d", &key);
+
+    comparisons = 0;
+
+    struct Node *result = search(root, key);
+
+    if (result != NULL)
+        printf("Student Found: %s\n", result->name);
+    else
+        printf("Student Not Found\n");
+
+    printf("Search Comparisons: %d\n", comparisons);
+    printf("AVL Height: %d\n", height(root));
+
+    return 0;
+}
